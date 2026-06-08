@@ -1,0 +1,1317 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ПМ2 — Подготовка к экзамену</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Unbounded:wght@400;700;900&display=swap');
+
+  :root {
+    --bg: #0a0a0f;
+    --surface: #12121a;
+    --surface2: #1a1a26;
+    --border: #2a2a40;
+    --accent: #6c63ff;
+    --accent2: #ff6584;
+    --green: #39d98a;
+    --red: #ff4d6d;
+    --yellow: #ffd166;
+    --text: #e8e8f0;
+    --muted: #7070a0;
+    --radius: 14px;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'JetBrains Mono', monospace;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(108,99,255,0.04) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(108,99,255,0.04) 1px, transparent 1px);
+    background-size: 40px 40px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .glow-orb {
+    position: fixed;
+    width: 600px;
+    height: 600px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(108,99,255,0.12) 0%, transparent 70%);
+    top: -200px;
+    right: -200px;
+    pointer-events: none;
+    z-index: 0;
+    animation: drift 8s ease-in-out infinite alternate;
+  }
+
+  @keyframes drift {
+    from { transform: translate(0,0); }
+    to { transform: translate(-60px, 80px); }
+  }
+
+  .screen {
+    position: relative;
+    z-index: 1;
+    display: none;
+    min-height: 100vh;
+  }
+  .screen.active { display: flex; flex-direction: column; }
+
+  /* ========== START SCREEN ========== */
+  #startScreen {
+    align-items: center;
+    justify-content: center;
+    padding: 40px 20px;
+    text-align: center;
+  }
+
+  .logo-badge {
+    display: inline-block;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    color: white;
+    font-family: 'Unbounded', sans-serif;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 3px;
+    padding: 6px 16px;
+    border-radius: 100px;
+    margin-bottom: 28px;
+    text-transform: uppercase;
+  }
+
+  .main-title {
+    font-family: 'Unbounded', sans-serif;
+    font-size: clamp(32px, 7vw, 60px);
+    font-weight: 900;
+    line-height: 1.1;
+    background: linear-gradient(135deg, #fff 30%, var(--accent));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 16px;
+  }
+
+  .subtitle {
+    color: var(--muted);
+    font-size: 13px;
+    line-height: 1.7;
+    max-width: 440px;
+    margin: 0 auto 48px;
+  }
+
+  .stats-row {
+    display: flex;
+    gap: 16px;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-bottom: 48px;
+  }
+
+  .stat-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 20px 28px;
+    min-width: 120px;
+  }
+
+  .stat-num {
+    font-family: 'Unbounded', sans-serif;
+    font-size: 28px;
+    font-weight: 900;
+    color: var(--accent);
+    display: block;
+  }
+
+  .stat-label {
+    font-size: 11px;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-top: 4px;
+  }
+
+  .mode-section { margin-bottom: 36px; }
+
+  .mode-label {
+    font-size: 11px;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    margin-bottom: 14px;
+  }
+
+  .mode-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    max-width: 400px;
+    margin: 0 auto;
+  }
+
+  .mode-btn {
+    background: var(--surface);
+    border: 2px solid var(--border);
+    border-radius: var(--radius);
+    padding: 16px 12px;
+    cursor: pointer;
+    transition: all 0.2s;
+    color: var(--text);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    text-align: center;
+  }
+
+  .mode-btn:hover { border-color: var(--accent); background: var(--surface2); }
+  .mode-btn.selected { border-color: var(--accent); background: rgba(108,99,255,0.12); }
+  .mode-btn .mode-icon { font-size: 22px; display: block; margin-bottom: 6px; }
+
+  .start-btn {
+    background: linear-gradient(135deg, var(--accent), #8b5cf6);
+    color: white;
+    border: none;
+    border-radius: var(--radius);
+    padding: 18px 48px;
+    font-family: 'Unbounded', sans-serif;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    letter-spacing: 1px;
+    transition: all 0.25s;
+    box-shadow: 0 8px 32px rgba(108,99,255,0.35);
+  }
+
+  .start-btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 16px 40px rgba(108,99,255,0.45);
+  }
+
+  .start-btn:active { transform: translateY(0); }
+
+  /* ========== QUIZ SCREEN ========== */
+  #quizScreen { padding: 0; }
+
+  .quiz-header {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 14px 20px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    backdrop-filter: blur(10px);
+  }
+
+  .q-counter {
+    font-family: 'Unbounded', sans-serif;
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--accent);
+    white-space: nowrap;
+  }
+
+  .progress-wrap {
+    flex: 1;
+    height: 6px;
+    background: var(--border);
+    border-radius: 100px;
+    overflow: hidden;
+  }
+
+  .progress-bar {
+    height: 100%;
+    background: linear-gradient(90deg, var(--accent), var(--accent2));
+    border-radius: 100px;
+    transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .timer-display {
+    font-size: 13px;
+    color: var(--yellow);
+    white-space: nowrap;
+    font-weight: 600;
+  }
+
+  .timer-display.danger { color: var(--red); animation: pulse 1s infinite; }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+  }
+
+  .quiz-body {
+    padding: 28px 20px;
+    max-width: 700px;
+    margin: 0 auto;
+    width: 100%;
+  }
+
+  .q-number-tag {
+    display: inline-block;
+    background: rgba(108,99,255,0.15);
+    border: 1px solid rgba(108,99,255,0.3);
+    color: var(--accent);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    padding: 4px 12px;
+    border-radius: 100px;
+    margin-bottom: 18px;
+    text-transform: uppercase;
+  }
+
+  .q-text {
+    font-size: clamp(15px, 3vw, 18px);
+    line-height: 1.65;
+    color: var(--text);
+    margin-bottom: 28px;
+    font-weight: 400;
+  }
+
+  .options-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 28px;
+  }
+
+  .option-btn {
+    background: var(--surface);
+    border: 2px solid var(--border);
+    border-radius: var(--radius);
+    padding: 16px 20px;
+    cursor: pointer;
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    transition: all 0.18s;
+    text-align: left;
+    width: 100%;
+    color: var(--text);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 14px;
+    line-height: 1.5;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .option-btn:hover:not(:disabled) {
+    border-color: var(--accent);
+    background: var(--surface2);
+    transform: translateX(4px);
+  }
+
+  .option-btn.correct {
+    border-color: var(--green);
+    background: rgba(57,217,138,0.12);
+    color: var(--green);
+  }
+
+  .option-btn.wrong {
+    border-color: var(--red);
+    background: rgba(255,77,109,0.1);
+    color: var(--red);
+  }
+
+  .option-btn:disabled { cursor: default; transform: none; }
+
+  .opt-letter {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    min-width: 28px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--muted);
+    transition: all 0.18s;
+  }
+
+  .option-btn.correct .opt-letter { background: var(--green); border-color: var(--green); color: #0a0a0f; }
+  .option-btn.wrong .opt-letter { background: var(--red); border-color: var(--red); color: white; }
+
+  .feedback-box {
+    border-radius: var(--radius);
+    padding: 16px 20px;
+    margin-bottom: 20px;
+    display: none;
+    font-size: 13px;
+    line-height: 1.6;
+    animation: slideUp 0.3s ease;
+  }
+
+  @keyframes slideUp {
+    from { opacity: 0; transform: translateY(12px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .feedback-box.correct {
+    display: block;
+    background: rgba(57,217,138,0.1);
+    border: 1px solid rgba(57,217,138,0.3);
+    color: var(--green);
+  }
+
+  .feedback-box.wrong {
+    display: block;
+    background: rgba(255,77,109,0.1);
+    border: 1px solid rgba(255,77,109,0.3);
+    color: var(--red);
+  }
+
+  .next-btn {
+    width: 100%;
+    background: linear-gradient(135deg, var(--accent), #8b5cf6);
+    color: white;
+    border: none;
+    border-radius: var(--radius);
+    padding: 16px;
+    font-family: 'Unbounded', sans-serif;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    letter-spacing: 1px;
+    transition: all 0.2s;
+    display: none;
+  }
+
+  .next-btn:hover { opacity: 0.9; transform: translateY(-2px); }
+  .next-btn.visible { display: block; animation: slideUp 0.3s ease; }
+
+  /* ========== RESULT SCREEN ========== */
+  #resultScreen {
+    align-items: center;
+    justify-content: center;
+    padding: 40px 20px;
+    text-align: center;
+  }
+
+  .result-emoji {
+    font-size: 72px;
+    margin-bottom: 20px;
+    animation: bounceIn 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+  }
+
+  @keyframes bounceIn {
+    from { transform: scale(0); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
+  }
+
+  .result-title {
+    font-family: 'Unbounded', sans-serif;
+    font-size: clamp(24px, 5vw, 40px);
+    font-weight: 900;
+    margin-bottom: 12px;
+    background: linear-gradient(135deg, #fff, var(--accent));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .score-big {
+    font-family: 'Unbounded', sans-serif;
+    font-size: clamp(48px, 12vw, 90px);
+    font-weight: 900;
+    line-height: 1;
+    margin: 24px 0;
+  }
+
+  .score-big span { color: var(--accent); }
+
+  .score-percent {
+    font-size: 18px;
+    color: var(--muted);
+    margin-bottom: 32px;
+  }
+
+  .result-stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    max-width: 440px;
+    margin: 0 auto 40px;
+  }
+
+  .r-stat {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 16px 8px;
+  }
+
+  .r-stat-num {
+    font-family: 'Unbounded', sans-serif;
+    font-size: 22px;
+    font-weight: 700;
+    display: block;
+    margin-bottom: 4px;
+  }
+
+  .r-stat-num.g { color: var(--green); }
+  .r-stat-num.r { color: var(--red); }
+  .r-stat-num.y { color: var(--yellow); }
+
+  .r-stat-label {
+    font-size: 10px;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+
+  .grade-badge {
+    display: inline-block;
+    padding: 10px 32px;
+    border-radius: 100px;
+    font-family: 'Unbounded', sans-serif;
+    font-size: 14px;
+    font-weight: 700;
+    margin-bottom: 40px;
+    letter-spacing: 1px;
+  }
+
+  .grade-5 { background: rgba(57,217,138,0.15); border: 2px solid var(--green); color: var(--green); }
+  .grade-4 { background: rgba(108,99,255,0.15); border: 2px solid var(--accent); color: var(--accent); }
+  .grade-3 { background: rgba(255,209,102,0.15); border: 2px solid var(--yellow); color: var(--yellow); }
+  .grade-2 { background: rgba(255,77,109,0.15); border: 2px solid var(--red); color: var(--red); }
+
+  .result-actions {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .btn-restart {
+    background: linear-gradient(135deg, var(--accent), #8b5cf6);
+    color: white;
+    border: none;
+    border-radius: var(--radius);
+    padding: 16px 32px;
+    font-family: 'Unbounded', sans-serif;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    letter-spacing: 1px;
+    transition: all 0.2s;
+  }
+
+  .btn-restart:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(108,99,255,0.4); }
+
+  .btn-review {
+    background: var(--surface);
+    color: var(--text);
+    border: 2px solid var(--border);
+    border-radius: var(--radius);
+    padding: 16px 32px;
+    font-family: 'Unbounded', sans-serif;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    letter-spacing: 1px;
+    transition: all 0.2s;
+  }
+
+  .btn-review:hover { border-color: var(--accent); }
+
+  /* ========== REVIEW SCREEN ========== */
+  #reviewScreen { padding: 0; }
+
+  .review-header {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 16px 20px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+  }
+
+  .back-btn {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    color: var(--text);
+    border-radius: 8px;
+    padding: 8px 16px;
+    cursor: pointer;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    transition: all 0.18s;
+  }
+
+  .back-btn:hover { border-color: var(--accent); color: var(--accent); }
+
+  .review-body { padding: 20px; max-width: 700px; margin: 0 auto; }
+
+  .review-item {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 20px;
+    margin-bottom: 16px;
+    border-left: 4px solid var(--border);
+  }
+
+  .review-item.fail { border-left-color: var(--red); }
+
+  .review-q { font-size: 13px; line-height: 1.6; margin-bottom: 12px; }
+  .review-your { font-size: 12px; color: var(--red); margin-bottom: 6px; }
+  .review-correct { font-size: 12px; color: var(--green); }
+  .review-badge {
+    float: right;
+    font-size: 10px;
+    font-weight: 700;
+    padding: 3px 10px;
+    border-radius: 100px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+  .review-badge.fail { background: rgba(255,77,109,0.15); color: var(--red); }
+
+  @media (max-width: 480px) {
+    .quiz-body { padding: 20px 14px; }
+    .option-btn { padding: 14px 14px; font-size: 13px; }
+    .result-stats { grid-template-columns: 1fr 1fr 1fr; }
+  }
+</style>
+</head>
+<body>
+<div class="glow-orb"></div>
+
+<!-- START SCREEN -->
+<div id="startScreen" class="screen active">
+  <div class="logo-badge">ПМ2 · Almaty Polytechnic College</div>
+  <div class="main-title">Тест<br>к экзамену</div>
+  <p class="subtitle">Настройка и обслуживание локально вычислительной сети и серверное оборудование организации.<br>50 случайных вопросов из 200. Варианты перемешиваются.</p>
+
+  <div class="stats-row">
+    <div class="stat-card">
+      <span class="stat-num">200</span>
+      <div class="stat-label">Вопросов в базе</div>
+    </div>
+    <div class="stat-card">
+      <span class="stat-num">50</span>
+      <div class="stat-label">На экзамене</div>
+    </div>
+    <div class="stat-card">
+      <span class="stat-num">50</span>
+      <div class="stat-label">Минут</div>
+    </div>
+  </div>
+
+  <div class="mode-section">
+    <div class="mode-label">Режим</div>
+    <div class="mode-grid">
+      <button class="mode-btn selected" data-mode="exam" onclick="selectMode(this)">
+        <span class="mode-icon">🎯</span>
+        Экзамен<br><span style="color:var(--muted);font-size:10px">50 вопросов · 50 мин</span>
+      </button>
+      <button class="mode-btn" data-mode="practice" onclick="selectMode(this)">
+        <span class="mode-icon">📚</span>
+        Практика<br><span style="color:var(--muted);font-size:10px">Без времени</span>
+      </button>
+      <button class="mode-btn" data-mode="quick" onclick="selectMode(this)">
+        <span class="mode-icon">⚡</span>
+        Быстрый<br><span style="color:var(--muted);font-size:10px">20 вопросов</span>
+      </button>
+      <button class="mode-btn" data-mode="all" onclick="selectMode(this)">
+        <span class="mode-icon">🔥</span>
+        Марафон<br><span style="color:var(--muted);font-size:10px">Все 200</span>
+      </button>
+    </div>
+  </div>
+
+  <button class="start-btn" onclick="startQuiz()">▶ НАЧАТЬ ТЕСТ</button>
+</div>
+
+<!-- QUIZ SCREEN -->
+<div id="quizScreen" class="screen">
+  <div class="quiz-header">
+    <div class="q-counter" id="qCounter">1 / 50</div>
+    <div class="progress-wrap">
+      <div class="progress-bar" id="progressBar" style="width:2%"></div>
+    </div>
+    <div class="timer-display" id="timerDisplay">50:00</div>
+  </div>
+  <div class="quiz-body">
+    <div class="q-number-tag" id="qNumTag">Вопрос 1</div>
+    <div class="q-text" id="qText"></div>
+    <div class="options-list" id="optionsList"></div>
+    <div class="feedback-box" id="feedbackBox"></div>
+    <button class="next-btn" id="nextBtn" onclick="nextQuestion()">СЛЕДУЮЩИЙ ВОПРОС →</button>
+  </div>
+</div>
+
+<!-- RESULT SCREEN -->
+<div id="resultScreen" class="screen">
+  <div class="result-emoji" id="resultEmoji">🎉</div>
+  <div class="result-title" id="resultTitle">Результат</div>
+  <div class="score-big" id="scoreBig"><span id="scoreNum">0</span>/<span id="scoreTotal">50</span></div>
+  <div class="score-percent" id="scorePercent">0%</div>
+  <div class="grade-badge" id="gradeBadge">—</div>
+  <div class="result-stats">
+    <div class="r-stat">
+      <span class="r-stat-num g" id="rCorrect">0</span>
+      <div class="r-stat-label">✓ Верно</div>
+    </div>
+    <div class="r-stat">
+      <span class="r-stat-num r" id="rWrong">0</span>
+      <div class="r-stat-label">✗ Неверно</div>
+    </div>
+    <div class="r-stat">
+      <span class="r-stat-num y" id="rTime">—</span>
+      <div class="r-stat-label">⏱ Время</div>
+    </div>
+  </div>
+  <div class="result-actions">
+    <button class="btn-restart" onclick="goStart()">↺ НАЧАТЬ СНОВА</button>
+    <button class="btn-review" onclick="showReview()">📋 РАЗБОР ОШИБОК</button>
+  </div>
+</div>
+
+<!-- REVIEW SCREEN -->
+<div id="reviewScreen" class="screen">
+  <div class="review-header">
+    <button class="back-btn" onclick="goResult()">← Назад</button>
+    <div style="font-family:'Unbounded',sans-serif;font-size:14px;font-weight:700;">Разбор ошибок</div>
+  </div>
+  <div class="review-body" id="reviewBody"></div>
+</div>
+
+<script>
+// ============================================================
+//  БАЗА ВОПРОСОВ — 200 вопросов из документа ПМ1
+// ============================================================
+const ALL_QUESTIONS = [
+  // 1
+  {q:"Устройство, выполняющее маршрутизацию пакетов между подсетями", correct:"Маршрутизатор", options:["Маршрутизатор","Концентратор","Коммутатор","Репитер"]},
+  // 2
+  {q:"Протокол, обеспечивающий гарантированную доставку данных", correct:"TCP", options:["ICMP","TCP","ARP","UDP"]},
+  // 3
+  {q:"Функция DHCP-сервера", correct:"Назначение IP", options:["Назначение IP","Передача FTP","Маршрутизация","Шифрование TLS"]},
+  // 4
+  {q:"Команда для отображения маршрута прохождения пакетов", correct:"tracert", options:["ipconfig","ping","netstat","tracert"]},
+  // 5
+  {q:"Уровень модели OSI, отвечающий за логическую адресацию", correct:"Сетевой", options:["Канальный","Сетевой","Сеансовый","Физический"]},
+  // 6
+  {q:"Технология логического разделения сети", correct:"VLAN", options:["DNS","NAT","VLAN","FTP"]},
+  // 7
+  {q:"Тип адреса, используемый коммутатором", correct:"MAC-адрес", options:["IP-адрес","MAC-адрес","DNS","URL"]},
+  // 8
+  {q:"Протокол защищенной передачи веб-страниц", correct:"HTTPS", options:["SMTP","FTP","HTTPS","HTTP"]},
+  // 9
+  {q:"Основная причина коллизий", correct:"Двойная передача", options:["Двойная передача","Ошибка DHCP","Ошибка DNS","Неверный шлюз"]},
+  // 10
+  {q:"Назначение межсетевого экрана", correct:"Фильтрация трафика", options:["Ускорение сети","Фильтрация трафика","Передача файлов","Архивация данных"]},
+  // 11
+  {q:"Протокол, предотвращающий петли в сетях Ethernet с помощью блокировки избыточных связей", correct:"STP", options:["LACP","STP","OSPF","BGP"]},
+  // 12
+  {q:"Функция, обеспечиваемая агрегированием нескольких физических каналов в один логический для увеличения пропускной способности", correct:"EtherChannel", options:["Dynamic ARP Inspection","DHCP Snooping","EtherChannel","Port Security"]},
+  // 13
+  {q:"Функция DHCP-сервера в локальной сети", correct:"Назначение IP", options:["Шифрование TLS","Назначение IP","Передача FTP","Маршрутизация"]},
+  // 14
+  {q:"Тип порта коммутатора, используемый для передачи трафика нескольких VLAN одновременно", correct:"Trunk", options:["Access","Monitor","Loopback","Trunk"]},
+  // 15
+  {q:"Уровень модели OSI для логической адресации в локальной сети", correct:"Сетевой", options:["Канальный","Физический","Сетевой","Сеансовый"]},
+  // 16
+  {q:"Определение native VLAN на trunk-порту коммутатора", correct:"VLAN без тегирования кадров", options:["VLAN для управления коммутатором","VLAN без тегирования кадров","VLAN для голосового трафика","VLAN для резервирования"]},
+  // 17
+  {q:"Протокол, обеспечивающий аутентификацию устройств в сети на основе портов", correct:"802.1X", options:["LACP","RSTP","NTP","802.1X"]},
+  // 18
+  {q:"Назначение DHCP snooping в локальной сети", correct:"Защита от поддельных DHCP-серверов", options:["Защита от поддельных DHCP-серверов","Ускорение передачи данных","Управление VLAN","Маршрутизация пакетов"]},
+  // 19
+  {q:"Механизм, предотвращаемый Dynamic ARP Inspection (DAI) в сети", correct:"Подделку ARP-запросов", options:["Несанкционированный доступ","Петли в сети","Подделку ARP-запросов","Перегрузку коммутатора"]},
+  // 20
+  {q:"Механизм, ограничивающий количество MAC-адресов на порту коммутатора", correct:"Port Security", options:["DHCP Snooping","Port Security","STP","QoS"]},
+  // 21
+  {q:"Протокол, используемый для агрегации каналов в EtherChannel", correct:"LACP", options:["LACP","RSTP","HSRP","VRRP"]},
+  // 22
+  {q:"Протокол для гарантированной доставки данных в сегментированной сети", correct:"TCP", options:["UDP","ARP","TCP","ICMP"]},
+  // 23
+  {q:"Механизм, который мог сработать при отключении порта при подключении нового коммутатора к пользовательскому порту", correct:"BPDU Guard блокирует порт при получении BPDU", options:["BPDU Guard блокирует порт при получении BPDU","Root Guard предотвращает изменение корневого моста","Loop Guard отключает порт при потере BPDU","Storm-control ограничивает широковещательный трафик"]},
+  // 24
+  {q:"Протокол, используемый для мониторинга сетевых устройств", correct:"SNMP", options:["NTP","SNMP","DHCP","ARP"]},
+  // 25
+  {q:"Функция, обеспечиваемая протоколом NTP в сети", correct:"Синхронизацию времени", options:["Защиту данных","Аутентификацию пользователей","Маршрутизацию","Синхронизацию времени"]},
+  // 26
+  {q:"Механизм, позволяющий устройствам автоматически получать IPv6-адреса", correct:"SLAAC", options:["DHCPv6","NAT","SLAAC","DNS"]},
+  // 27
+  {q:"Протокол, передающий информацию о приоритете голосового трафика при настройке IP-телефонов в офисе", correct:"LLDP-MED для передачи параметров телефонии", options:["LLDP-MED для передачи параметров телефонии","DHCP option 82 для маршрутизации запросов","VRRP для резервирования шлюза","OSPF passive-interface для безопасности"]},
+  // 28
+  {q:"Стандарт беспроводной связи, обеспечивающий более высокую скорость и безопасность по сравнению с WPA2", correct:"WPA3", options:["WPA","WEP","WPA3","802.11b"]},
+  // 29
+  {q:"Механизм, используемый для ограничения широковещательного шторма на портах коммутатора", correct:"Storm-control для ограничения широковещательного трафика", options:["Root Guard для защиты корневого моста","BPDU Guard для блокировки BPDU на пользовательских портах","Loop Guard для предотвращения петель","Storm-control для ограничения широковещательного трафика"]},
+  // 30
+  {q:"Диапазон частот, используемый для Wi-Fi с меньшей дальностью и большей скоростью", correct:"5 GHz", options:["2.4 GHz","5 GHz","900 MHz","1.8 GHz"]},
+  // 31
+  {q:"Функция, обеспечиваемая протоколом HSRP в сетях", correct:"Резервирование шлюза по умолчанию", options:["Резервирование шлюза по умолчанию","Агрегацию каналов","Шифрование трафика","Мониторинг устройств"]},
+  // 32
+  {q:"Протокол внутренней динамической маршрутизации с использованием метрики, основанной на задержке и пропускной способности", correct:"EIGRP", options:["OSPF","BGP","RIP","EIGRP"]},
+  // 33
+  {q:"Механизм, предотвращающий нестабильность в работе сети после потери BPDU на порту коммутатора", correct:"Loop Guard для предотвращения петель при потере BPDU", options:["BPDU Guard для блокировки BPDU","Root Guard для защиты корневого моста","Loop Guard для предотвращения петель при потере BPDU","Storm-control для ограничения трафика"]},
+  // 34
+  {q:"Протокол, используемый для резервирования шлюза по умолчанию в локальной сети", correct:"HSRP", options:["OSPF","HSRP","BGP","EIGRP"]},
+  // 35
+  {q:"Тип агрегации каналов, поддерживающий динамическое распределение нагрузки", correct:"LACP", options:["Static LAG","STP","PAgP","LACP"]},
+  // 36
+  {q:"Механизм, обеспечивающий передачу DHCP-запросов между разными подсетями при настройке маршрутизатора", correct:"DHCP relay для пересылки запросов между сетями", options:["DHCP option 82 для добавления информации о клиенте","DHCP relay для пересылки запросов между сетями","Split horizon для предотвращения маршрутизации","Floating static route для резервирования маршрутов"]},
+  // 37
+  {q:"Механизм, применяемый для защиты сети от подмены ARP-ANSWERов", correct:"IP Source Guard для контроля источника IP", options:["IP Source Guard для контроля источника IP","ARP spoofing mitigation для предотвращения атак","Port Security для ограничения MAC-адресов","Storm-control для ограничения широковещательного трафика"]},
+  // 38
+  {q:"Механизм DHCP snooping, предотвращающий определённые действия в локальной сети", correct:"Подделку DHCP-сообщений", options:["Перегрузку DHCP-сервера","Подделку DHCP-сообщений","Потерю IP-адресов","Петли в сети"]},
+  // 39
+  {q:"Механизм, защищающий сеть от подмены ARP-ANSWERов", correct:"Dynamic ARP Inspection", options:["Spanning Tree Protocol","Port Security","DHCP Snooping","Dynamic ARP Inspection"]},
+  // 40
+  {q:"Ограничение, устанавливаемое Port Security на коммутаторе", correct:"Количество MAC-адресов на порту", options:["Скорость передачи данных","Количество MAC-адресов на порту","Доступ по IP-адресу","Тип VLAN"]},
+  // 41
+  {q:"Протокол маршрутизации, использующий алгоритм Беллмана-Форда", correct:"RIP", options:["OSPF","EIGRP","BGP","RIP"]},
+  // 42
+  {q:"Необходимый DHCP-функционал для автоматического получения IP-адресов с добавлением информации о порте подключения клиента", correct:"DHCP option 82 для добавления информации о порте", options:["DHCP relay для пересылки запросов","DHCP snooping для защиты от подделок","DHCP option 82 для добавления информации о порте","DHCPv6 stateful для IPv6 адресации"]},
+  // 43
+  {q:"Протокол, используемый для синхронизации времени в сети", correct:"NTP", options:["SNMP","NTP","DHCP","ICMP"]},
+  // 44
+  {q:"Протокол, подходящий для настройки резервирования шлюза с использованием виртуального IP в локальной сети для обеспечения отказоустойчивости", correct:"VRRP для виртуального IP адреса", options:["GLBP для балансировки нагрузки","HSRP с предвыбором активного маршрутизатора","VRRP для виртуального IP адреса","OSPF для динамической маршрутизации"]},
+  // 45
+  {q:"Настройка автоматического восстановления порта коммутатора после его автоматического отключения из-за ошибки", correct:"errdisable recovery для автоматического включения", options:["Storm-control для ограничения трафика","errdisable recovery для автоматического включения","BPDU Guard для блокировки BPDU","Root Guard для защиты корневого моста"]},
+  // 46
+  {q:"Определение trunk-порта на коммутаторе", correct:"Порт для передачи трафика нескольких VLAN", options:["Порт для управления коммутатором","Порт для подключения одного устройства","Порт для резервирования каналов","Порт для передачи трафика нескольких VLAN"]},
+  // 47
+  {q:"Протокол маршрутизации, используемый для обмена маршрутами между автономными системами", correct:"BGP", options:["OSPF","EIGRP","BGP","RIP"]},
+  // 48
+  {q:"Протокол, расширяющий LLDP для передачи дополнительных параметров, таких как VLAN и приоритет, при подключении IP-телефонов", correct:"LLDP-MED для телефонии", options:["DHCP option 82","VRRP","OSPF passive-interface","LLDP-MED для телефонии"]},
+  // 49
+  {q:"Протокол, обеспечивающий автоматическую настройку IPv6-адресов", correct:"SLAAC", options:["DHCPv6","SLAAC","NDP","ICMPv6"]},
+  // 50
+  {q:"В офисной сети необходимо разделить голосовой и обычный трафик на одном порту коммутатора. Механизм, позволяющий это реализовать", correct:"Voice VLAN для голосового трафика", options:["DHCP relay","BPDU Guard","Voice VLAN для голосового трафика","Storm-control"]},
+  // 51
+  {q:"Протокол, предотвращающий петли в сетях Ethernet", correct:"RSTP", options:["LACP","RSTP","OSPF","BGP"]},
+  // 52
+  {q:"Инструмент, используемый для ограничения доступа к сети по определённым IP-адресам и протоколам", correct:"ACL для фильтрации трафика", options:["ACL для фильтрации трафика","Root Guard для защиты корневого моста","Loop Guard для предотвращения петель","Storm-control для ограничения широковещательного трафика"]},
+  // 53
+  {q:"Протокол, обеспечивающий защищённый удалённый доступ к устройствам", correct:"SSH", options:["SNMP","FTP","HTTP","SSH"]},
+  // 54
+  {q:"Протокол, используемый для обнаружения и предотвращения петель в сетях Ethernet", correct:"RSTP", options:["LACP","RSTP","DHCP Snooping","OSPF"]},
+  // 55
+  {q:"Уровень модели OSI, отвечающий за установку, управление и завершение соединений", correct:"Сеансовый", options:["Сеансовый","Транспортный","Прикладной","Канальный"]},
+  // 56
+  {q:"Функция, обеспечивающая агрегацию нескольких физических каналов в один логический с балансировкой нагрузки", correct:"LACP", options:["STP","LACP","NAT","ACL"]},
+  // 57
+  {q:"Тип адреса, используемый для идентификации устройств в пределах одной локальной сети", correct:"MAC-адрес", options:["Anycast-адрес","IPv4-адрес","IPv6-адрес","MAC-адрес"]},
+  // 58
+  {q:"Протокол, обеспечивающий безопасное шифрование данных при передаче веб-страниц", correct:"HTTPS", options:["FTP","HTTPS","SMTP","Telnet"]},
+  // 59
+  {q:"Причина частых сбоев и потери пакетов при подключении нескольких устройств к одному сегменту сети, чаще всего вызывающая такие коллизии", correct:"Одновременная передача данных несколькими устройствами", options:["Одновременная передача данных несколькими устройствами","Неправильная настройка VLAN","Недостаточная пропускная способность маршрутизатора","Ошибки в настройках DHCP"]},
+  // 60
+  {q:"Основная функция межсетевого экрана (Firewall) в сети", correct:"Контроль доступа и фильтрация трафика", options:["Управление IP-адресами","Мониторинг трафика","Шифрование данных","Контроль доступа и фильтрация трафика"]},
+  // 61
+  {q:"Устройство или функция, обеспечивающие маршрутизацию между несколькими VLAN на одном коммутаторе", correct:"Маршрутизатор или Layer 3 коммутатор", options:["DHCP relay","Маршрутизатор или Layer 3 коммутатор","BPDU Guard","Storm-control"]},
+  // 62
+  {q:"Протокол, гарантирующий доставку данных в сетях с коммутацией кадров", correct:"TCP", options:["TCP","UDP","ICMP","ARP"]},
+  // 63
+  {q:"Основная задача DHCP-сервера при централизованной выдаче IP-адресов клиентам в локальной сети", correct:"Назначать IP-адреса и параметры сети клиентам", options:["Обеспечить маршрутизацию между подсетями","Назначать IP-адреса и параметры сети клиентам","Фильтровать нежелательный трафик","Обеспечивать безопасность беспроводных сетей"]},
+  // 64
+  {q:"Команда в Cisco IOS для проверки маршрута прохождения пакетов к удалённому хосту", correct:"traceroute для отображения маршрута", options:["traceroute для отображения маршрута","ping для проверки доступности","show ip route для просмотра таблицы маршрутизации","debug ip packet для анализа пакетов"]},
+  // 65
+  {q:"Уровень модели OSI, отвечающий за логическую адресацию и маршрутизацию пакетов при проектировании сети", correct:"Транспортный уровень (4-й)", options:["Сетевой уровень (3-й)","Канальный уровень (2-й)","Транспортный уровень (4-й)","Прикладной уровень (7-й)"]},
+  // 66
+  {q:"В компании требуется разделить сеть на логические сегменты для повышения безопасности и управления. Название этой технологии", correct:"VLAN для логического разделения", options:["VPN","VLAN для логического разделения","NAT","DHCP relay"]},
+  // 67
+  {q:"Тип адреса, используемый коммутатором для передачи кадров в локальной сети", correct:"MAC-адрес", options:["MAC-адрес","IPv4-адрес","IPv6-адрес","Multicast-адрес"]},
+  // 68
+  {q:"Технология, ускоряющая переход при роуминге Wi-Fi клиентов между точками доступа без длительного разрыва голосового вызова", correct:"802.11r Fast Transition", options:["Band Steering","802.11r Fast Transition","Hidden SSID","WPA2-PSK"]},
+  // 69
+  {q:"Причина коллизий при передаче кадров в VLAN", correct:"Двойная передача", options:["Ошибка DHCP","Ошибка DNS","Неверный шлюз","Двойная передача"]},
+  // 70
+  {q:"Механизм, применяемый на граничном порту STP для недопущения выбора подключенного коммутатора корневым устройством", correct:"Root Guard", options:["Root Guard","Loop Guard","Storm Control","DHCP Relay"]},
+  // 71
+  {q:"Опция, добавляющая в DHCP-запрос клиента сведения о коммутаторе и порте подключения", correct:"Option 82", options:["Option 43","Option 82","Option 150","Option 66"]},
+  // 72
+  {q:"Технология, подходящая для изоляции таблиц маршрутизации нескольких клиентов на одном маршрутизаторе в филиале без отдельных устройств", correct:"VRF-lite", options:["VLAN Trunking","NAT Overload","VRF-lite","Port Mirroring"]},
+  // 73
+  {q:"Настройка, обеспечивающая автоматическое возвращение порта коммутатора в рабочее состояние после errdisable через заданное время", correct:"Errdisable Recovery", options:["BPDU Filter","Errdisable Recovery","Root Guard","MAC Aging"]},
+  // 74
+  {q:"Механизм, помогающий перераспределить беспроводных клиентов, выбирающих диапазон 2,4 ГГц при доступном менее загруженном диапазоне 5 ГГц", correct:"Band Steering", options:["Hidden SSID","Band Steering","Captive Portal","WEP Filtering"]},
+  // 75
+  {q:"Протокол, обеспечивающий резервирование маршрутизаторов для отказоустойчивости", correct:"VRRP", options:["LACP","OSPF","EIGRP","VRRP"]},
+  // 76
+  {q:"Определение VLAN в контексте локальных сетей", correct:"Логическое разделение сети", options:["Логическое разделение сети","Физическое разделение сети","Тип маршрутизатора","Метод шифрования трафика"]},
+  // 77
+  {q:"Технология, при которой два коммутатора дата-центра выглядят для сервера как один узел при агрегировании каналов", correct:"MLAG", options:["RSPAN","MLAG","Proxy ARP","IGMP Query"]},
+  // 78
+  {q:"Механизм QoS, применяемый для обслуживания голосового трафика раньше обычных данных при перегрузке канала", correct:"Low Latency Queuing", options:["Traffic Shaping","Best Effort","Low Latency Queuing","Route Filtering"]},
+  // 79
+  {q:"Причина, чаще всего вызывающая коллизии в Ethernet-сети", correct:"Одновременная передача на общем сегменте", options:["Перегрузка маршрутизатора","Одновременная передача на общем сегменте","Недостаточная пропускная способность","Ошибки в IP-адресации"]},
+  // 80
+  {q:"Название проблемы, при которой пакеты с флагом DF теряются при прохождении туннеля из-за слишком большого размера кадра", correct:"MTU Black Hole", options:["ARP Spoofing","DNS Poisoning","CAM Overflow","MTU Black Hole"]},
+  // 81
+  {q:"Явление, при котором пакеты уходят через одного провайдера, а возвращаются через другого, усложняя фильтрацию на межсетевом экране", correct:"Asymmetric Routing", options:["Route Flapping","Broadcast Storm","Asymmetric Routing","VLAN Hopping"]},
+  // 82
+  {q:"Протокол, гарантирующий доставку данных в IP-сетях", correct:"TCP", options:["UDP","TCP","ICMP","ARP"]},
+  // 83
+  {q:"Механизм для блокировки кадров от неизвестных MAC-адресов на порту доступа после превышения заданного лимита", correct:"Port Security", options:["Storm Control","Port Security","Root Guard","IGMP Snooping"]},
+  // 84
+  {q:"Механизм, включаемый для предотвращения использования поддельных ARP-ANSWERов в коммутируемой сети", correct:"Dynamic ARP Inspection", options:["Port Isolation","Root Guard","Dynamic ARP Inspection","Route Summarization"]},
+  // 85
+  {q:"Функция, необходимая внутреннему серверу для обращения к публичному адресу собственного NAT-шлюза из той же локальной сети", correct:"NAT Hairpinning", options:["Static PAT","NAT Hairpinning","Proxy ARP","DNS Forwarding"]},
+  // 86
+  {q:"Подход, используемый для выдачи разных DNS-ANSWERов на одно и то же доменное имя для внутренних и внешних пользователей", correct:"Split-horizon DNS", options:["DNSSEC Signing","Recursive Lookup","Split-horizon DNS","Zone Transfer"]},
+  // 87
+  {q:"Маршрутизатор должен отбросить пакет, если обратный маршрут к адресу источника отсутствует в таблице маршрутизации. Используемый механизм", correct:"uRPF", options:["Policy Routing","uRPF","OSPF Stub","BGP MED"]},
+  // 88
+  {q:"В коммутируемой сети требуется передать копию трафика порта на анализатор пакетов. Используемый режим", correct:"SPAN", options:["SPAN","STP Root Guard","DHCP Relay","OSPF Area"]},
+  // 89
+  {q:"Частая причина коллизий в Ethernet-сети", correct:"Одновременная передача данных", options:["Потеря пакетов","Одновременная передача данных","Неисправность кабеля","Перегрузка сервера"]},
+  // 90
+  {q:"В сети нужно ограничить скорость потока и немедленно отбрасывать пакеты сверх заданного порога. Используемый механизм", correct:"Traffic Policing", options:["Traffic Shaping","Priority Queuing","Traffic Policing","Route Reflector"]},
+  // 91
+  {q:"Устройство, выполняющее маршрутизацию между подсетями", correct:"Коммутатор уровня 2", options:["Коммутатор уровня 2","Хаб","Маршрутизатор","Точка доступа"]},
+  // 92
+  {q:"Протокол, гарантирующий надежную доставку данных при наличии потерь пакетов в сети", correct:"TCP", options:["UDP","ICMP","ARP","TCP"]},
+  // 93
+  {q:"Механизм в сети IPv6, позволяющий узлу определять канальный адрес соседнего устройства без применения ARP", correct:"Neighbor Discovery", options:["Router Advertisement","Neighbor Discovery","DHCP Snooping","Proxy ARP"]},
+  // 94
+  {q:"Тип резервного маршрута, используемый только при отказе основного канала с меньшей административной дистанцией", correct:"Floating Static Route", options:["Floating Static Route","Default Gateway","Connected Route","OSPF Neighbor"]},
+  // 95
+  {q:"Механизм, помогающий динамически обнаружить петли, вызывающие широковещательный шторм в сети Ethernet", correct:"Root Guard", options:["BPDU Guard","Root Guard","Loop Guard","Storm Control"]},
+  // 96
+  {q:"Метод логического разделения пользователей для повышения безопасности при настройке сети", correct:"VLAN", options:["Subnetting","Port Security","VLAN","NAT"]},
+  // 97
+  {q:"Тип адреса, используемый коммутатором при передаче кадров внутри VLAN", correct:"IP-адрес", options:["IP-адрес","MAC-адрес","Broadcast-адрес","Multicast-адрес"]},
+  // 98
+  {q:"В компании требуется обеспечить безопасное соединение для веб-сайта. Протокол, используемый для этого", correct:"HTTPS", options:["FTP","HTTPS","SMTP","Telnet"]},
+  // 99
+  {q:"В сети Ethernet частые коллизии вызваны основной причиной", correct:"Одновременная передача данных несколькими устройствами", options:["Использование разных протоколов","Одновременная передача данных несколькими устройствами","Неправильная маршрутизация","Проблемы с IP-адресацией"]},
+  // 100
+  {q:"В локальной сети межсетевой экран выполняет основную функцию", correct:"Фильтрации и контроля доступа", options:["Маршрутизации трафика","Мониторинга сети","УправленияVLAN","Фильтрации и контроля доступа"]},
+  // 101
+  {q:"Уровень модели OSI, отвечающий за надежную доставку данных", correct:"Транспортный", options:["Физический","Транспортный","Канальный","Сетевой"]},
+  // 102
+  {q:"Процесс добавления заголовков к данным при передаче между уровнями OSI", correct:"Инкапсуляция", options:["Инкапсуляция","Декапсуляция","Сегментация","Модуляция"]},
+  // 103
+  {q:"Длина заголовка протокола UDP составляет", correct:"8 байт", options:["20 байт","32 байта","16 байт","8 байт"]},
+  // 104
+  {q:"Для автоматического назначения IP-адресов в сети используется протокол", correct:"DHCP", options:["DNS","ARP","DHCP","SNMP"]},
+  // 105
+  {q:"Состояние TCP-соединения, означающее установку соединения и возможность передачи данных", correct:"ESTABLISHED", options:["SYN-SENT","LISTEN","TIME-WAIT","ESTABLISHED"]},
+  // 106
+  {q:"Тип топологии сети, считающийся наиболее надежным за счет избыточности связей", correct:"Полносвязная", options:["Шинообразная","Полносвязная","Звездообразная","Кольцеобразная"]},
+  // 107
+  {q:"Протокол, используемый для предотвращения петель на канальном уровне", correct:"STP", options:["RIP","OSPF","BGP","STP"]},
+  // 108
+  {q:"VLAN является", correct:"Виртуальной локальной сетью", options:["Типом сетевого кабеля","Виртуальной локальной сетью","Протоколом маршрутизации","Методом шифрования"]},
+  // 109
+  {q:"Порт по умолчанию для протокола HTTP", correct:"80", options:["21","443","25","80"]},
+  // 110
+  {q:"Технология, позволяющая нескольким устройствам использовать один публичный IP-адрес", correct:"NAT", options:["NAT","VLAN","VTP","STP"]},
+  // 111
+  {q:"Протокол OSPF использует алгоритм для расчета кратчайшего пути", correct:"SPF", options:["Беллмана-Форда","DUAL","Дейкстры","SPF"]},
+  // 112
+  {q:"Значение TTL в IP-пакете уменьшается при прохождении через устройство", correct:"Маршрутизатор", options:["Концентратор","Маршрутизатор","Коммутатор","Повторитель"]},
+  // 113
+  {q:"Протокол для сопоставления IP-адреса с MAC-адресом", correct:"ARP", options:["RARP","ARP","DHCP","ICMP"]},
+  // 114
+  {q:"Маска подсети определяет границу сети и хоста", correct:"Граница подсети", options:["Граница подсети","Сетевой пароль","Доменное имя","Физический адрес"]},
+  // 115
+  {q:"Уровень модели OSI, отвечающий за выбор маршрута передачи данных", correct:"Сетевой", options:["Канальный","Физический","Прикладной","Сетевой"]},
+  // 116
+  {q:"Протокол, который следует использовать администратору для настройки защищённого удаленного доступа к коммутатору", correct:"SSH", options:["Telnet","FTP","HTTP","SSH"]},
+  // 117
+  {q:"Устройство, работающее на физическом уровне модели OSI", correct:"Концентратор", options:["Маршрутизатор","Концентратор","Коммутатор","Межсетевой экран"]},
+  // 118
+  {q:"Значение аббревиатуры QoS при настройке качества обслуживания в сети", correct:"Quality of Service", options:["Quality of Security","Quality of Service","Quantity of Signals","Queue of Sessions"]},
+  // 119
+  {q:"Протокол для передачи электронной почты между серверами", correct:"SMTP", options:["SMTP","POP3","IMAP","HTTP"]},
+  // 120
+  {q:"В компании требуется объединить несколько физических каналов для увеличения пропускной способности. Название этой технологии", correct:"EtherChannel", options:["VLAN","NAT","VPN","EtherChannel"]},
+  // 121
+  {q:"Метрикой протокола RIP является", correct:"Количество хопов", options:["Количество хопов","Пропускная способность","Задержка","Надежность"]},
+  // 122
+  {q:"Внешним протоколом шлюза (EGP) является", correct:"BGP", options:["IS-IS","OSPF","EIGRP","BGP"]},
+  // 123
+  {q:"Длина IPv6 адреса составляет", correct:"128 бит", options:["256 бит","128 бит","32 бита","64 бита"]},
+  // 124
+  {q:"Административное расстояние", correct:"Степень доверия", options:["Количество интерфейсов","Физическое расстояние","Время задержки","Степень доверия"]},
+  // 125
+  {q:"Для управления и мониторинга устройств используется протокол", correct:"SNMP", options:["SMTP","DHCP","SNMP","NTP"]},
+  // 126
+  {q:"Для создания защищенного туннеля через публичную сеть используется", correct:"VPN", options:["VPN","NAT","VLAN","VTP"]},
+  // 127
+  {q:"Какой тип кабеля обеспечивает наибольшую дальность передачи без повторителей?", correct:"Оптоволоконный кабель", options:["Витая пара Cat 6","Оптоволоконный кабель","Коаксиальный кабель","Телефонный кабель"]},
+  // 128
+  {q:"Коллизия в Ethernet", correct:"Одновременная передача", options:["Одновременная передача","Переполнение буфера","Ошибка маршрутизации","Потеря IP-адреса"]},
+  // 129
+  {q:"Протокол, используемый для синхронизации времени на всех устройствах в сети", correct:"NTP", options:["SNMP","DHCP","NTP","FTP"]},
+  // 130
+  {q:"DMZ - это", correct:"Сегмент для публичных сервисов", options:["Сегмент для публичных сервисов","Сеть без паролей","Резервный центр данных","Зона с отключенным Wi-Fi"]},
+  // 131
+  {q:"Стандарт беспроводных локальных сетей (Wi-Fi)", correct:"IEEE 802.11", options:["IEEE 802.3","IEEE 802.15","IEEE 802.11","IEEE 802.1Q"]},
+  // 132
+  {q:"Широковещательный шторм возникает из-за петли broadcast", correct:"Петля broadcast", options:["Очередь буфера","Потеря пакетов","Петля unicast","Петля broadcast"]},
+  // 133
+  {q:"Шифрование и сжатие данных выполняет уровень OSI", correct:"Представительский", options:["Прикладной","Сетевой","Представительский","Сеансовый"]},
+  // 134
+  {q:"Режим, который включают для автоматического возврата резервным шлюзом активной роли после восстановления основного маршрутизатора", correct:"HSRP Preemption", options:["PortFast","Passive Interface","Route Poisoning","HSRP Preemption"]},
+  // 135
+  {q:"Адрес для широковещательной рассылки в IPv4", correct:"255.255.255.255", options:["0.0.0.0","255.255.255.255","127.0.0.1","192.168.1.1"]},
+  // 136
+  {q:"Для чего используется trunk-порт на коммутаторе?", correct:"Порт, передающий трафик нескольких VLAN", options:["Порт для подключения принтера","Порт для управления коммутатором","Порт с самой низкой скоростью","Порт, передающий трафик нескольких VLAN"]},
+  // 137
+  {q:"Протокол разрешения имен хостов в IP-адреса", correct:"DNS", options:["DHCP","ICMP","DNS","ARP"]},
+  // 138
+  {q:"Full Duplex", correct:"Одновременная передача и прием данных", options:["Одновременная передача и прием данных","Передача данных по очереди","Передача данных только в одну сторону","Удвоенная скорость интернета"]},
+  // 139
+  {q:"Уровень OSI, использующий кадры (frames)", correct:"Канальный", options:["Транспортный","Сетевой","Канальный","Физический"]},
+  // 140
+  {q:"Задаёт параметр Default Gateway в настройках сети", correct:"Адрес шлюза", options:["Адрес DNS","Адрес хоста","Адрес VLAN","Адрес шлюза"]},
+  // 141
+  {q:"Для передачи файлов используется протокол", correct:"FTP", options:["FTP","SMTP","HTTP","SNMP"]},
+  // 142
+  {q:"Интерфейс Loopback является виртуальным и всегда в состоянии 'up'", correct:"Виртуальный интерфейс", options:["Сломанный порт","Метод обхода блокировок","Виртуальный интерфейс","Кабель, соединенный сам с собой"]},
+  // 143
+  {q:"Диапазон IP-адресов для частных сетей по RFC 1918", correct:"192.168.0.0/16", options:["192.168.0.0/16","8.8.8.0/24","224.0.0.0/4","1.1.1.0/24"]},
+  // 144
+  {q:"Anycast в IPv6 обеспечивает доставку пакета ближайшему узлу из группы", correct:"Доставка ближайшему узлу", options:["Рассылка всем узлам","Рассылка одному узлу","Доставка ближайшему узлу","Рассылка группе узлов"]},
+  // 145
+  {q:"Для динамической маршрутизации внутри автономной системы используется протокол", correct:"OSPF", options:["BGP","SSH","HTTP","OSPF"]},
+  // 146
+  {q:"PoE (Power over Ethernet) обеспечивает передачу электроэнергии по сетевому кабелю", correct:"Передача электроэнергии", options:["Защита от молний","Передача электроэнергии","Тип беспроводной связи","Очень быстрый интернет"]},
+  // 147
+  {q:"Уровень модели OSI, обеспечивающий установку и завершение соединений между приложениями при проектировании сети", correct:"Сеансовый", options:["Сеансовый","Транспортный","Прикладной","Канальный"]},
+  // 148
+  {q:"Jitter в сетях означает", correct:"Колебание задержки", options:["Скорость передачи","Тип вируса","Колебание задержки","Размер пакета"]},
+  // 149
+  {q:"Меры, которые следует включить для защиты сеансов синхронизации времени от подмены источника времени в NTP", correct:"NTP Authentication", options:["NTP Authentication","DNS Recursion","DHCP Relay","ARP Cache"]},
+  // 150
+  {q:"MTU (Maximum Transmission Unit)", correct:"Максимальный размер пакета", options:["Максимальное время работы","Количество пользователей","Максимальный размер пакета","Мощность передатчика"]},
+  // 151
+  {q:"Протокол для обнаружения соседей в сетях Cisco", correct:"CDP", options:["CDP","VTP","LLDP","STP"]},
+  // 152
+  {q:"Функцию синхронизации базы VLAN между коммутаторами выполняет протокол", correct:"VTP", options:["Ускорение интернета","Шифрование VLAN","Маршрутизация","VTP"]},
+  // 153
+  {q:"Уровень OSI, единицей данных которого являются сегменты", correct:"Транспортный", options:["Транспортный","Канальный","Физический","Сетевой"]},
+  // 154
+  {q:"Промежуточный сервер, выполняющий запросы от имени клиента", correct:"Прокси-сервер", options:["Антивирус","Резервная копия","Игровой сервер","Прокси-сервер"]},
+  // 155
+  {q:"Для безопасного просмотра веб-страниц используется протокол", correct:"HTTPS", options:["Telnet","FTP","HTTPS","HTTP"]},
+  // 156
+  {q:"MAC-адрес — это уникальный физический адрес", correct:"Сетевого интерфейса", options:["Операционной системы","Пользователя","Компьютера в интернете","Сетевого интерфейса"]},
+  // 157
+  {q:"Уровень модели OSI, отвечающий за взаимодействие с приложениями пользователя", correct:"Прикладной", options:["Прикладной","Транспортный","Сеансовый","Представительский"]},
+  // 158
+  {q:"Подсети (Subnetting) — это процесс", correct:"Разделения сети на несколько", options:["Объединения сетей","Удаления части сети","Разделения сети на несколько","Покупки оборудования"]},
+  // 159
+  {q:"Протокол для проверки доступности узла (пинг)", correct:"ICMP", options:["ARP","UDP","TCP","ICMP"]},
+  // 160
+  {q:"Межсетевой экран (Firewall) — это устройство или ПО для", correct:"Фильтрации трафика", options:["Фильтрации трафика","Охлаждения","Хранения данных","Рисования"]},
+  // 161
+  {q:"Стандарт, описывающий технологию Ethernet", correct:"IEEE 802.3", options:["IEEE 802.15","IEEE 802.1Q","IEEE 802.3","IEEE 802.11"]},
+  // 162
+  {q:"SSID в беспроводных сетях", correct:"Идентификатор сети", options:["Скорость соединения","Номер канала","Пароль Wi-Fi","Идентификатор сети"]},
+  // 163
+  {q:"Уровень модели OSI, отвечающий за преобразование данных в биты и их передачу", correct:"Физический", options:["Физический","Канальный","Сетевой","Транспортный"]},
+  // 164
+  {q:"Static IP — это", correct:"Постоянный IP-адрес вручную", options:["Неактивный адрес","IP-адрес, меняющийся часто","Скрытый адрес","Постоянный IP-адрес вручную"]},
+  // 165
+  {q:"Протокол для динамического обмена маршрутами между провайдерами", correct:"BGP", options:["BGP","EIGRP","OSPF","RIP"]},
+  // 166
+  {q:"Latency (задержка) — это", correct:"Время прохождения пакета", options:["Ширина канала","Размер файла","Время прохождения пакета","Количество ошибок"]},
+  // 167
+  {q:"Уровень модели OSI, работающий с единицами данных, называемыми пакетами", correct:"Сетевой", options:["Канальный","Транспортный","Прикладной","Сетевой"]},
+  // 168
+  {q:"Bandwidth (пропускная способность) — это", correct:"Максимальный поток данных", options:["Вес оборудования","Количество портов","Максимальный поток данных","Длина кабеля"]},
+  // 169
+  {q:"Протокол для автоматического получения настроек сети", correct:"DHCP", options:["SNMP","SMTP","DNS","DHCP"]},
+  // 170
+  {q:"VPN (Virtual Private Network) — это", correct:"Защищённое соединение поверх сети", options:["Защищённое соединение поверх сети","Платный интернет","Вирусная программа","Социальная сеть"]},
+  // 171
+  {q:"Уровень OSI, отвечающий за физическую адресацию в локальной сети, где коммутатор работает с MAC-адресами устройств", correct:"Канальный", options:["Сетевой","Транспортный","Канальный","Физический"]},
+  // 172
+  {q:"Default Route применяется при отсутствии точного маршрута", correct:"Резервный маршрут", options:["Резервный маршрут","Ошибка настройки","Быстрый маршрут","Путь к принтеру"]},
+  // 173
+  {q:"Протокол для управления коммутаторами и маршрутизаторами через сеть", correct:"SSH", options:["POP3","FTP","SSH","SMTP"]},
+  // 174
+  {q:"Packet Loss означает", correct:"Потерю пакетов данных в сети", options:["Потерю пакетов данных в сети","Удаление старых файлов","Сжатие трафика","Кражу данных"]},
+  // 175
+  {q:"Для маршрутизации пакетов в IP-сети используется уровень модели OSI", correct:"Сетевой", options:["Канальный","Прикладной","Транспортный","Сетевой"]},
+  // 176
+  {q:"Access Point подключает беспроводных клиентов к сети", correct:"Точка доступа", options:["Маршрутный узел","Сетевой пароль","Точка доступа","Портовый адаптер"]},
+  // 177
+  {q:"Протокол для перевода доменных имен в IP-адреса", correct:"DNS", options:["DHCP","ARP","HTTP","DNS"]},
+  // 178
+  {q:"Ping используется для проверки сетевой связности узла", correct:"Проверка связи", options:["Сканер портов","Передача файлов","Проверка связи","Смена адреса"]},
+  // 179
+  {q:"Уровень модели OSI, отвечающий за надежность соединения и контроль потока", correct:"Транспортный", options:["Сеансовый","Прикладной","Сетевой","Транспортный"]},
+  // 180
+  {q:"Router пересылает пакеты между различными сетями", correct:"Маршрутизатор", options:["Мост сегментов","Точка доступа","Маршрутизатор","Концентратор"]},
+  // 181
+  {q:"Протокол для передачи гипертекста является", correct:"HTTP", options:["FTP","SMTP","SNMP","HTTP"]},
+  // 182
+  {q:"Устройство для соединения узлов в одной сети по MAC-адресам является", correct:"Коммутатор", options:["Коммутатор","Концентратор","Маршрутизатор","Модем"]},
+  // 183
+  {q:"Самый верхний уровень модели OSI является", correct:"Прикладной", options:["Сетевой","Сеансовый","Прикладной","Физический"]},
+  // 184
+  {q:"IP-адрес является уникальным числовым идентификатором устройства в сети", correct:"Числовой идентификатор", options:["Числовой идентификатор","Почтовый индекс","Имя пользователя","Номер телефона"]},
+  // 185
+  {q:"Протокол для получения почты с сервера используется", correct:"POP3/IMAP", options:["DNS","SMTP","HTTP","POP3/IMAP"]},
+  // 186
+  {q:"Топология сети является схемой расположения и соединения узлов", correct:"Схема сети", options:["Схема сети","Карта города","Список сотрудников","Наука о почве"]},
+  // 187
+  {q:"Уровень модели OSI, отвечающий за кодирование и преобразование данных", correct:"Представительский", options:["Прикладной","Транспортный","Канальный","Физический"]},
+  // 188
+  {q:"LAN (Local Area Network) является локальной вычислительной сетью", correct:"Локальная сеть", options:["Глобальная сеть","Спутниковая связь","Радиосвязь","Локальная сеть"]},
+  // 189
+  {q:"Протокол, используемый для разрешения IP-адресов в MAC-адреса", correct:"ARP", options:["ARP","DHCP","ICMP","NTP"]},
+  // 190
+  {q:"WAN (Wide Area Network) является глобальной сетью", correct:"Глобальная сеть", options:["Офисная сеть","Bluetooth","Домашняя сеть","Глобальная сеть"]},
+  // 191
+  {q:"Уровень модели OSI, отвечающий за управление диалогом", correct:"Сеансовый", options:["Сетевой","Транспортный","Сеансовый","Канальный"]},
+  // 192
+  {q:"Для соединения сетей с разными протоколами используется", correct:"Шлюз", options:["Коммутатор","Маршрутизатор","Мост","Шлюз"]},
+  // 193
+  {q:"Протокол для отправки электронной почты", correct:"SMTP", options:["HTTP","POP3","IMAP","SMTP"]},
+  // 194
+  {q:"Узел сети — это любое устройство, которое", correct:"Подключено к сети", options:["Обрабатывает ошибки","Передаёт данные","Подключено к сети","Управляет трафиком"]},
+  // 195
+  {q:"Уровень модели OSI, отвечающий за обнаружение ошибок", correct:"Канальный", options:["Канальный","Транспортный","Сетевой","Физический"]},
+  // 196
+  {q:"Протокол — это набор правил для", correct:"Взаимодействия устройств", options:["Обработки данных","Шифрования информации","Взаимодействия устройств","Обмена сообщениями"]},
+  // 197
+  {q:"Для защищённого удалённого управления используется протокол", correct:"SSH", options:["SSH","FTP","Telnet","HTTP"]},
+  // 198
+  {q:"Концентратор — это устройство, которое", correct:"Рассылает данные на все порты", options:["Фильтрует трафик","Управляет соединениями","Маршрутизирует пакеты","Рассылает данные на все порты"]},
+  // 199
+  {q:"Уровень модели OSI, выполняющий маршрутизацию", correct:"Сетевой", options:["Канальный","Сеансовый","Сетевой","Транспортный"]},
+  // 200
+  {q:"Ethernet — это семейство технологий для", correct:"Проводных локальных сетей", options:["Беспроводной связи","Проводных локальных сетей","Оптической передачи","Пакетной передачи данных"]}
+];
+
+// ============================================================
+//  СОСТОЯНИЕ ПРИЛОЖЕНИЯ
+// ============================================================
+let mode = 'exam';
+let questions = [];
+let current = 0;
+let score = 0;
+let answered = false;
+let timerInterval = null;
+let timeLeft = 0;
+let startTime = null;
+let userAnswers = [];
+
+const LETTERS = ['А','Б','В','Г','Д'];
+
+function selectMode(btn) {
+  document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('selected'));
+  btn.classList.add('selected');
+  mode = btn.dataset.mode;
+}
+
+function shuffle(arr) {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+function startQuiz() {
+  const pool = shuffle([...ALL_QUESTIONS]);
+  const count = mode === 'quick' ? 20 : mode === 'all' ? ALL_QUESTIONS.length : 50;
+  questions = pool.slice(0, Math.min(count, pool.length)).map(q => ({
+    ...q,
+    shuffledOptions: shuffle(q.options)
+  }));
+
+  current = 0;
+  score = 0;
+  userAnswers = Array(questions.length).fill(null);
+  answered = false;
+
+  const isPractice = mode === 'practice';
+  timeLeft = mode === 'quick' ? 20 * 60 : mode === 'all' ? 90 * 60 : 50 * 60;
+  startTime = Date.now();
+
+  showScreen('quizScreen');
+  document.getElementById('timerDisplay').style.display = isPractice ? 'none' : '';
+  renderQuestion();
+
+  if (!isPractice) startTimer();
+}
+
+function startTimer() {
+  clearInterval(timerInterval);
+  updateTimerDisplay();
+  timerInterval = setInterval(() => {
+    timeLeft--;
+    updateTimerDisplay();
+    if (timeLeft <= 0) {
+      clearInterval(timerInterval);
+      endQuiz();
+    }
+  }, 1000);
+}
+
+function updateTimerDisplay() {
+  const m = Math.floor(timeLeft / 60);
+  const s = timeLeft % 60;
+  const el = document.getElementById('timerDisplay');
+  el.textContent = `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+  el.className = 'timer-display' + (timeLeft < 60 ? ' danger' : '');
+}
+
+function renderQuestion() {
+  const q = questions[current];
+  const total = questions.length;
+
+  document.getElementById('qCounter').textContent = `${current + 1} / ${total}`;
+  document.getElementById('progressBar').style.width = `${((current + 1) / total) * 100}%`;
+  document.getElementById('qNumTag').textContent = `Вопрос ${current + 1}`;
+  document.getElementById('qText').textContent = q.q;
+
+  const list = document.getElementById('optionsList');
+  list.innerHTML = '';
+
+  q.shuffledOptions.forEach((opt, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'option-btn';
+    btn.innerHTML = `<span class="opt-letter">${LETTERS[i] || String(i+1)}</span><span>${opt}</span>`;
+    btn.onclick = () => selectAnswer(btn, opt, q);
+    list.appendChild(btn);
+  });
+
+  document.getElementById('feedbackBox').className = 'feedback-box';
+  document.getElementById('feedbackBox').textContent = '';
+  const nb = document.getElementById('nextBtn');
+  nb.classList.remove('visible');
+  nb.textContent = current < questions.length - 1 ? 'СЛЕДУЮЩИЙ ВОПРОС →' : 'ЗАВЕРШИТЬ ТЕСТ ✓';
+  answered = false;
+}
+
+function selectAnswer(btn, opt, q) {
+  if (answered) return;
+  answered = true;
+
+  const isCorrect = opt === q.correct;
+  userAnswers[current] = { chosen: opt, correct: q.correct, question: q.q, isCorrect };
+
+  document.querySelectorAll('.option-btn').forEach(b => {
+    b.disabled = true;
+    const bOpt = b.querySelector('span:last-child').textContent;
+    if (bOpt === q.correct) b.classList.add('correct');
+    else if (b === btn && !isCorrect) b.classList.add('wrong');
+  });
+
+  const fb = document.getElementById('feedbackBox');
+  if (isCorrect) {
+    score++;
+    fb.className = 'feedback-box correct';
+    fb.textContent = '✓ Правильно!';
+  } else {
+    fb.className = 'feedback-box wrong';
+    fb.textContent = `✗ Неверно. Правильный ответ: ${q.correct}`;
+  }
+
+  document.getElementById('nextBtn').classList.add('visible');
+}
+
+function nextQuestion() {
+  if (!answered) return;
+  current++;
+  if (current >= questions.length) {
+    endQuiz();
+  } else {
+    renderQuestion();
+  }
+}
+
+function endQuiz() {
+  clearInterval(timerInterval);
+  const elapsed = Math.floor((Date.now() - startTime) / 1000);
+  const total = questions.length;
+  const pct = Math.round((score / total) * 100);
+
+  showScreen('resultScreen');
+
+  document.getElementById('scoreNum').textContent = score;
+  document.getElementById('scoreTotal').textContent = total;
+  document.getElementById('scorePercent').textContent = `${pct}% правильных ответов`;
+  document.getElementById('rCorrect').textContent = score;
+  document.getElementById('rWrong').textContent = total - score;
+  const em = Math.floor(elapsed / 60);
+  const es = elapsed % 60;
+  document.getElementById('rTime').textContent = `${em}:${String(es).padStart(2,'0')}`;
+
+  let emoji, title, gradeClass, gradeText;
+  if (pct >= 90) { emoji='🏆'; title='Отлично!'; gradeClass='grade-5'; gradeText='Оценка: 5'; }
+  else if (pct >= 75) { emoji='🎯'; title='Хорошо!'; gradeClass='grade-4'; gradeText='Оценка: 4'; }
+  else if (pct >= 60) { emoji='📘'; title='Удовлетворительно'; gradeClass='grade-3'; gradeText='Оценка: 3'; }
+  else { emoji='📖'; title='Нужно повторить'; gradeClass='grade-2'; gradeText='Оценка: 2'; }
+
+  document.getElementById('resultEmoji').textContent = emoji;
+  document.getElementById('resultTitle').textContent = title;
+  const gb = document.getElementById('gradeBadge');
+  gb.className = 'grade-badge ' + gradeClass;
+  gb.textContent = gradeText;
+}
+
+function showReview() {
+  const body = document.getElementById('reviewBody');
+  body.innerHTML = '';
+
+  const wrong = userAnswers.filter(a => a && !a.isCorrect);
+  if (wrong.length === 0) {
+    body.innerHTML = '<div style="text-align:center;padding:40px;color:var(--green);font-size:18px;">🎉 Все ответы верные!</div>';
+  } else {
+    wrong.forEach((a) => {
+      const div = document.createElement('div');
+      div.className = 'review-item fail';
+      div.innerHTML = `
+        <span class="review-badge fail">✗ Ошибка</span>
+        <div class="review-q">📌 ${a.question}</div>
+        <div class="review-your">Ваш ответ: ${a.chosen}</div>
+        <div class="review-correct">✓ Правильно: ${a.correct}</div>
+      `;
+      body.appendChild(div);
+    });
+  }
+
+  showScreen('reviewScreen');
+}
+
+function goResult() { showScreen('resultScreen'); }
+function goStart() { clearInterval(timerInterval); showScreen('startScreen'); }
+
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+
+// Проверка базы вопросов при загрузке
+console.log(`База вопросов загружена: ${ALL_QUESTIONS.length} вопросов`);
+if (ALL_QUESTIONS.length !== 200) {
+  console.warn(`Ожидается 200 вопросов, загружено ${ALL_QUESTIONS.length}`);
+}
+</script>
+</body>
+</html>
